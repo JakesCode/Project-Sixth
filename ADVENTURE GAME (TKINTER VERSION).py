@@ -1,8 +1,8 @@
 locations = [["The Porch", "An old, wooden porch lies before the entrance to the house.", {"key": ["A rusty old key.", False, [False, None]]}],
 	
-	["Hallway", "The hallway is laden with dust. Old paintings hang from the crumbling walls.", {"painting": ["An old painting. '07/10/1873' is written in the lower right corner.", True, [False, None]],
+	["Hallway", "The hallway is laden with dust. Old paintings hang from the crumbling walls.", {"painting": ["An old painting. '17/11/1873' is written in the lower right corner.", True, [False, None]],
 
-		"safe": ["A steel safe. It ain't coming open with brute force.", True, [True, ["NUM", ["7183", "REMOVE REPETITIONS"]]]]}],
+		"safe": ["A steel safe. It ain't coming open with brute force.", True, [True, ["NUM", ["1783", "LEFT TO RIGHT | REMOVE REPETITIONS"]]]]}],
 	
 	] # <- Final List Bracket (Needed)
 
@@ -24,6 +24,33 @@ class GameWindow:
 		frame.pack()
 
 		title = Label(master, text="PROJECT-SIXTH", bg="#A0CFE6", font=("Courier New", 31)).pack(expand=1, fill=BOTH)
+
+		self.mainWindow(master)
+
+	def mainWindow(self, master):
+		l = Label(master, text="Choose an option....", font=("Courier New", 20)).pack()
+		lookButton = Button(master, text="Look", font=("Courier New", 8), command=lambda:self.look(master)).pack()
+
+	def look(self, master):
+		lookWindow = Toplevel()
+		lookWindow.title("Look")
+
+		itemKeys = list(locations[position][2].keys())
+
+		if len(itemKeys) > 0:
+			l = Label(lookWindow, text="Looking around, you see the following items....\n").pack()
+			for x in range(0, len(itemKeys)):
+				icon = PhotoImage(file=("icons\\" + itemKeys[x] + ".png"))
+				l = Label(lookWindow, image=icon)
+				l.photo = icon
+				l.pack()
+				l = Label(lookWindow, text=("" + itemKeys[x].title())).pack()
+				l = Label(lookWindow, text=("	" + locations[position][2][itemKeys[x]][0] + "\n")).pack()
+		else:
+			l = Label(lookWindow, text="There's nothing at this location....").pack()
+
+
+
 
 		
 
@@ -113,12 +140,6 @@ def prompt(position):
 		print("look - look around for items")
 		print("take (take x) - take an item")
 		print("use (take x) - use an item")
-
-	elif user[:4] == "move":
-		if user[5:] == "left":
-			position -= 1
-		elif user[5:] == "right":
-			position += 1
 
 	elif user[:3] == "use":
 		itemToUse = user[4:]
