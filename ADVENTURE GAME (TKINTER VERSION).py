@@ -4,7 +4,7 @@ locations = [["The Porch", "An old, wooden porch lies before the entrance to the
 
 		"safe": ["A steel safe. It ain't coming open with brute force.", True, [True, ["NUM", ["1783", "LEFT TO RIGHT | REMOVE REPETITIONS"]]]]}],
 	
-	] # <- Fina lList Bracket (Needed)
+	] # <- Final List Bracket (Needed)
 
 # Items #
 # [[PLACE NAME, PLACE DESCRIPTION, {ITEMS: [ITEM DESCRIPTION: STATIC(TRUE) OR NOT STATIC(FALSE), SPECIAL [YES(TRUE) OR NO(FALSE), TYPE(OR JUST 'NONE' IF IT SAYS FALSE BEFOREHAND)]]}]]
@@ -20,10 +20,10 @@ inventory = {}
 import glob
 
 for infn in glob.glob("icons/*.png"):
-    if "-small" in infn: continue
+    if "-small" in infn: continue 
     outfn = infn.replace(".png", "-small.png")
     im = PILImage.open(infn)
-    im.thumbnail((50, 50))
+    im.thumbnail((100, 100))
     im.save(outfn)
 
 class GameWindow:
@@ -35,11 +35,19 @@ class GameWindow:
 
 		title = Label(master, text="PROJECT-SIXTH", bg="#A0CFE6", font=("Courier New", 31)).pack(expand=1, fill=BOTH)
 
+		self.locationTitleVar = StringVar()
+		self.locationTitleVar.set(locations[position][0])
+		locationTitle = Label(master, textvariable=self.locationTitleVar).pack()
+		self.locationDescriptionVar = StringVar()
+		self.locationDescriptionVar.set(locations[position][1])
+		locationDescription = Label(master, textvariable=self.locationDescriptionVar).pack()
+
 		self.mainWindow(master)
 
 	def mainWindow(self, master):
 		l = Label(master, text="Choose an option....", font=("Courier New", 20)).pack()
 		lookButton = Button(master, text="Look", font=("Courier New", 8), command=lambda:self.look(master)).pack()
+		takeButton = Button(master, text="Take", font=("Courier New", 8), command=lambda:self.take(master)).pack()
 
 	def look(self, master):
 		lookWindow = Toplevel()
@@ -56,14 +64,65 @@ class GameWindow:
 				l.pack()
 				l = Label(lookWindow, text=("" + itemKeys[x].title())).pack()
 				l = Label(lookWindow, text=("	" + locations[position][2][itemKeys[x]][0] + "\n")).pack()
-
 		else:
 			l = Label(lookWindow, text="There's nothing at this location....").pack()
+			icon = PhotoImage(file=("icons\\cancel-small.png"))
+			l = Label(lookWindow, image=icon)
+			l.photo = icon
+			l.pack()
 
+	def take(self, master):
+		takeWindow = Toplevel()
+		takeWindow.title("Take")
+		takeWindow.geometry("230x180")
 
+		self.itemKeys = list(locations[position][2].keys())
+		itemKeysList = []
 
+		for x in self.itemKeys:
+			itemKeysList.append(x)
 
+		l = Label(takeWindow, text="Take what?").pack()
+
+		v = StringVar(takeWindow)
+		v.set(itemKeysList[0])
+		m = OptionMenu(takeWindow, v, itemKeysList)
+		m.pack()
 		
+		b = Button(takeWindow, text="Take", command=lambda:self.getStuff(m, v)).pack()
+
+		self.l2 = StringVar()
+		l3 = Label(takeWindow, textvariable=self.l2).pack()
+
+		blankLabel = Label(takeWindow, text="\n").pack()
+
+		look = Button(takeWindow, text="See what items are around you", command=lambda:self.look(master)).pack()
+
+
+	def getStuff(self, m, v):
+		self.itemToGet = v.get()
+		self.l2.set(self.itemToGet)
+
+		if self.itemToGet in self.itemKeys and not(locations[position][2][self.itemToGet][1]): # if the item you're trying to take is at the location and it's not a static item then take it
+			self.l2.set(("Took the " + self.itemToGet + "."))
+			self.itemKeys = self.updateList(self.itemKeys)
+			inventory[self.itemToGet] = locations[position][2][self.itemToGet]
+			del locations[position][2][self.itemToGet]
+
+		try:
+			if locations[position][2][self.itemToGet][1] and not(locations[position][2][self.itemToGet][2][0]):
+				self.l2.set("You can't pick that up. It won't budge!")
+		except KeyError:
+			if not(self.itemToGet in self.itemKeys):
+				print("That item's not here....")
+
+
+	def updateList(self, itemKeys):
+		self.itemKeys = list(locations[position][2].keys())
+		return self.itemKeys
+
+
+
 
 
 def displayStats(position):
