@@ -4,7 +4,7 @@ locations = [["The Porch", "An old, wooden porch lies before the entrance to the
 
 		"safe": ["A steel safe. It ain't coming open with brute force.", True, [True, ["NUM", ["1783", "LEFT TO RIGHT | REMOVE REPETITIONS"]]]]}],
 	
-	] # <- Final List Bracket (Needed)
+	] # <- Fina lList Bracket (Needed)
 
 # Items #
 # [[PLACE NAME, PLACE DESCRIPTION, {ITEMS: [ITEM DESCRIPTION: STATIC(TRUE) OR NOT STATIC(FALSE), SPECIAL [YES(TRUE) OR NO(FALSE), TYPE(OR JUST 'NONE' IF IT SAYS FALSE BEFOREHAND)]]}]]
@@ -12,9 +12,19 @@ locations = [["The Porch", "An old, wooden porch lies before the entrance to the
 
 import os
 from tkinter import *
+from PIL import Image as PILImage
 
 position = 0
 inventory = {}
+
+import glob
+
+for infn in glob.glob("icons/*.png"):
+    if "-small" in infn: continue
+    outfn = infn.replace(".png", "-small.png")
+    im = PILImage.open(infn)
+    im.thumbnail((50, 50))
+    im.save(outfn)
 
 class GameWindow:
 
@@ -40,12 +50,13 @@ class GameWindow:
 		if len(itemKeys) > 0:
 			l = Label(lookWindow, text="Looking around, you see the following items....\n").pack()
 			for x in range(0, len(itemKeys)):
-				icon = PhotoImage(file=("icons\\" + itemKeys[x] + ".png"))
+				icon = PhotoImage(file=("icons\\" + itemKeys[x] + "-small.png"))
 				l = Label(lookWindow, image=icon)
 				l.photo = icon
 				l.pack()
 				l = Label(lookWindow, text=("" + itemKeys[x].title())).pack()
 				l = Label(lookWindow, text=("	" + locations[position][2][itemKeys[x]][0] + "\n")).pack()
+
 		else:
 			l = Label(lookWindow, text="There's nothing at this location....").pack()
 
