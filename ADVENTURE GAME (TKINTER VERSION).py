@@ -13,6 +13,7 @@ locations = [["The Porch", "An old, wooden porch lies before the entrance to the
 import os
 from tkinter import *
 from PIL import Image as PILImage
+import re
 
 position = 0
 inventory = {}
@@ -77,16 +78,12 @@ class GameWindow:
 		takeWindow.geometry("230x180")
 
 		self.itemKeys = list(locations[position][2].keys())
-		itemKeysList = []
-
-		for x in self.itemKeys:
-			itemKeysList.append(x)
 
 		l = Label(takeWindow, text="Take what?").pack()
 
 		v = StringVar(takeWindow)
-		v.set(itemKeysList[0])
-		m = OptionMenu(takeWindow, v, itemKeysList)
+		v.set(self.itemKeys[0])
+		m = OptionMenu(takeWindow, v, self.itemKeys)
 		m.pack()
 		
 		b = Button(takeWindow, text="Take", command=lambda:self.getStuff(m, v)).pack()
@@ -101,19 +98,21 @@ class GameWindow:
 
 	def getStuff(self, m, v):
 		self.itemToGet = v.get()
-		self.l2.set(self.itemToGet)
+		self.itemToGet2 = self.itemToGet.replace("[", "").replace("]", "").replace("'", "")
+		print(self.itemToGet2)
+		self.l2.set(self.itemToGet2)
 
-		if self.itemToGet in self.itemKeys and not(locations[position][2][self.itemToGet][1]): # if the item you're trying to take is at the location and it's not a static item then take it
-			self.l2.set(("Took the " + self.itemToGet + "."))
+		if self.itemToGet2 in self.itemKeys and not(locations[position][2][self.itemToGet2][1]): # if the item you're trying to take is at the location and it's not a static item then take it
+			self.l2.set(("Took the " + self.itemToGet2 + "."))
 			self.itemKeys = self.updateList(self.itemKeys)
-			inventory[self.itemToGet] = locations[position][2][self.itemToGet]
-			del locations[position][2][self.itemToGet]
+			inventory[self.itemToGet2] = locations[position][2][self.itemToGet2]
+			del locations[position][2][self.itemToGet2]
 
 		try:
-			if locations[position][2][self.itemToGet][1] and not(locations[position][2][self.itemToGet][2][0]):
+			if locations[position][2][self.itemToGet2][1] and not(locations[position][2][self.itemToGet2][2][0]):
 				self.l2.set("You can't pick that up. It won't budge!")
 		except KeyError:
-			if not(self.itemToGet in self.itemKeys):
+			if not(self.itemToGet2 in self.itemKeys):
 				print("That item's not here....")
 
 
