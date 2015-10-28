@@ -30,31 +30,40 @@ for infn in glob.glob("icons/*.png"):
 class GameWindow:
 
 	def __init__(self, master):
+		self.position = 0
 		frame = Frame(master)
-		frame.config(width=400, height=200, bg="#A0CFE6")
+		frame.config(width=200, height=80)
 		frame.pack()
+
+		iconName = ("icons\\brutal-helm-small.png")
+		icon = PhotoImage(file=iconName)
+		self.l = Label(master, image=icon)
+		self.l.photo = icon
+		self.l.pack()
 
 		title = Label(master, text="PROJECT-SIXTH", bg="#A0CFE6", font=("Courier New", 31)).pack(expand=1, fill=BOTH)
 
 		self.locationTitleVar = StringVar()
-		self.locationTitleVar.set(locations[position][0])
+		self.locationTitleVar.set(locations[self.position][0])
 		locationTitle = Label(master, textvariable=self.locationTitleVar).pack()
 		self.locationDescriptionVar = StringVar()
-		self.locationDescriptionVar.set(locations[position][1])
+		self.locationDescriptionVar.set(locations[self.position][1])
 		locationDescription = Label(master, textvariable=self.locationDescriptionVar).pack()
 
 		self.mainWindow(master)
+
 
 	def mainWindow(self, master):
 		l = Label(master, text="Choose an option....", font=("Courier New", 20)).pack()
 		lookButton = Button(master, text="Look", font=("Courier New", 8), command=lambda:self.look(master)).pack()
 		takeButton = Button(master, text="Take", font=("Courier New", 8), command=lambda:self.take(master)).pack()
+		useButton = Button(master, text="Use", font=("Courier New", 8), command=lambda:self.use(master, self.position)).pack()
 
 	def look(self, master):
 		lookWindow = Toplevel()
 		lookWindow.title("Look")
 
-		itemKeys = list(locations[position][2].keys())
+		itemKeys = list(locations[self.position][2].keys())
 
 		if len(itemKeys) > 0:
 			l = Label(lookWindow, text="Looking around, you see the following items....\n").pack()
@@ -64,7 +73,7 @@ class GameWindow:
 				l.photo = icon
 				l.pack()
 				l = Label(lookWindow, text=("" + itemKeys[x].title())).pack()
-				l = Label(lookWindow, text=("	" + locations[position][2][itemKeys[x]][0] + "\n")).pack()
+				l = Label(lookWindow, text=("	" + locations[self.position][2][itemKeys[x]][0] + "\n")).pack()
 		else:
 			l = Label(lookWindow, text="There's nothing at this location....").pack()
 			icon = PhotoImage(file=("icons\\cancel-small.png"))
@@ -75,9 +84,9 @@ class GameWindow:
 	def take(self, master):
 		takeWindow = Toplevel()
 		takeWindow.title("Take")
-		takeWindow.geometry("230x180")
+		takeWindow.geometry("230x300")
 
-		self.itemKeys = list(locations[position][2].keys())
+		self.itemKeys = list(locations[self.position][2].keys())
 
 		l = Label(takeWindow, text="Take what?").pack()
 
@@ -86,30 +95,47 @@ class GameWindow:
 		m = OptionMenu(takeWindow, v, self.itemKeys)
 		m.pack()
 		
-		b = Button(takeWindow, text="Take", command=lambda:self.getStuff(m, v)).pack()
+		b = Button(takeWindow, text="Take", command=lambda:self.getStuff(m, v, takeWindow)).pack()
 
 		self.l2 = StringVar()
 		l3 = Label(takeWindow, textvariable=self.l2).pack()
 
-		blankLabel = Label(takeWindow, text="\n").pack()
-
 		look = Button(takeWindow, text="See what items are around you", command=lambda:self.look(master)).pack()
 
+		iconName = ("icons\\bowman-small.png")
 
-	def getStuff(self, m, v):
+		icon = PhotoImage(file=iconName)
+		self.l = Label(takeWindow, image=icon)
+		self.l.photo = icon
+		self.l.pack()
+
+		blankLabel = Label(takeWindow, text="\n").pack()
+
+
+	def updateImage(self, toChangeTo, window):
+		self.l.destroy()
+		iconName = ("icons\\" + toChangeTo + "-small.png")
+		icon = PhotoImage(file=iconName)
+		self.l = Label(window, image=icon)
+		self.l.photo = icon
+		self.l.pack()
+
+
+	def getStuff(self, m, v, takeWindow):
 		self.itemToGet = v.get()
 		self.itemToGet2 = self.itemToGet.replace("[", "").replace("]", "").replace("'", "")
 		print(self.itemToGet2)
 		self.l2.set(self.itemToGet2)
 
-		if self.itemToGet2 in self.itemKeys and not(locations[position][2][self.itemToGet2][1]): # if the item you're trying to take is at the location and it's not a static item then take it
+		if self.itemToGet2 in self.itemKeys and not(locations[self.position][2][self.itemToGet2][1]): # if the item you're trying to take is at the location and it's not a static item then take it
 			self.l2.set(("Took the " + self.itemToGet2 + "."))
 			self.itemKeys = self.updateList(self.itemKeys)
-			inventory[self.itemToGet2] = locations[position][2][self.itemToGet2]
-			del locations[position][2][self.itemToGet2]
+			inventory[self.itemToGet2] = locations[self.position][2][self.itemToGet2]
+			del locations[self.position][2][self.itemToGet2]
+			self.updateImage(self.itemToGet2, takeWindow)
 
 		try:
-			if locations[position][2][self.itemToGet2][1] and not(locations[position][2][self.itemToGet2][2][0]):
+			if locations[self.position][2][self.itemToGet2][1] and not(locations[self.position][2][self.itemToGet2][2][0]):
 				self.l2.set("You can't pick that up. It won't budge!")
 		except KeyError:
 			if not(self.itemToGet2 in self.itemKeys):
@@ -117,8 +143,65 @@ class GameWindow:
 
 
 	def updateList(self, itemKeys):
-		self.itemKeys = list(locations[position][2].keys())
+		self.itemKeys = list(locations[self.position][2].keys())
 		return self.itemKeys
+
+
+	def use(self, master, position):
+		useWindow = Toplevel()
+		useWindow.title("Use")
+		self.invKeys = list(inventory.keys())
+
+
+		if len(self.invKeys) > 0:
+			iconName = ("icons\\bowman-small.png")
+			icon = PhotoImage(file=iconName)
+			self.l = Label(useWindow, image=icon)
+			self.l.photo = icon
+			self.l.pack()
+
+			v = StringVar(useWindow)
+			v.set(self.invKeys[0])
+			l = Label(useWindow, text="Use an item....").pack()
+			m = OptionMenu(useWindow, v, self.invKeys)
+			m.pack()
+
+			b = Button(useWindow, text="Use", command=lambda:self.useStuff(v.get(), useWindow, self.position)).pack()
+		else:
+			l = Label(useWindow, text="You don't have anything in your inventory....").pack()
+			icon = PhotoImage(file=("icons\\cancel-small.png"))
+			l = Label(useWindow, image=icon)
+			l.photo = icon
+			l.pack()
+
+
+	def useStuff(self, thing, window, position):
+		itemToUse = thing.replace("[", "").replace("]", "").replace("'", "")
+		if itemToUse in list(inventory.keys()):
+			l = Label(window, text="On what?\n").pack()
+			e = Entry(window)
+			e.pack()
+			b = Button(window, text="Submit", command=lambda:self.checkUse(e.get(), itemToUse, self.position, window)).pack()
+		else:
+			l = Label(window, text="You don't have that item.").pack()
+
+	def checkUse(self, e, itemToUse, position, window):
+		go = parseUse(itemToUse, (locations[self.position][0]), e)
+		if go:
+			self.position += 1
+			self.wellDone()
+			window.destroy()
+
+	def wellDone(self):
+		moveWindow = Toplevel()
+		moveWindow.title("Congratulations!")
+		l = Label(moveWindow, text="The pathway to the next room is open.\nWell done!").pack()
+		iconName = ("icons\\one-eyed-small.png")
+		icon = PhotoImage(file=iconName)
+		self.l = Label(moveWindow, image=icon)
+		self.l.photo = icon
+		self.l.pack()
+		b = Button(moveWindow, text="-> -> Go -> ->", command=lambda:moveWindow.destroy()).pack()
 
 
 
