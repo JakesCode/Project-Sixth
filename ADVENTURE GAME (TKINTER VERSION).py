@@ -176,9 +176,11 @@ class GameWindow:
 
 
 	def useStuff(self, thing, window, position):
+		self.label2 = StringVar()
 		itemToUse = thing.replace("[", "").replace("]", "").replace("'", "")
 		if itemToUse in list(inventory.keys()):
-			l = Label(window, text="On what?\n").pack()
+			self.label2.set("On what?\n")
+			l = Label(window, textvariable=self.label2).pack()
 			e = Entry(window)
 			e.pack()
 			b = Button(window, text="Submit", command=lambda:self.checkUse(e.get(), itemToUse, self.position, window)).pack()
@@ -190,7 +192,11 @@ class GameWindow:
 		if go:
 			self.position += 1
 			self.wellDone()
+			self.locationTitleVar.set(locations[self.position][0])
+			self.locationDescriptionVar.set(locations[self.position][1])
 			window.destroy()
+		else:
+			self.label2.set("Nothing happened.\nAre you sure you're thinking straight?")
 
 	def wellDone(self):
 		moveWindow = Toplevel()
