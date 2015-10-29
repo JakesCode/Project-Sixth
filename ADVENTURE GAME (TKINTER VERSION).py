@@ -1,6 +1,6 @@
 locations = [["The Porch", "An old, wooden porch lies before the entrance to the house.", {"key": ["A rusty old key.", False, [False, None]]}],
 	
-	["Hallway", "The hallway is laden with dust. Old paintings hang from the crumbling walls.", {"painting": ["An old painting. '17/11/1873' is written in the lower right corner.", True, [False, None]],
+	["Hallway", "The hallway is laden with dust.\nOld paintings hang from the crumbling walls.", {"painting": ["An old painting. '17/11/1873' is written in the lower right corner.", True, [False, None]],
 
 		"safe": ["A steel safe. It ain't coming open with brute force.", True, [True, ["NUM", ["1783", "LEFT TO RIGHT | REMOVE REPETITIONS"]]]]}],
 	
@@ -58,6 +58,7 @@ class GameWindow:
 		lookButton = Button(master, text="Look", font=("Courier New", 8), command=lambda:self.look(master)).pack()
 		takeButton = Button(master, text="Take", font=("Courier New", 8), command=lambda:self.take(master)).pack()
 		useButton = Button(master, text="Use", font=("Courier New", 8), command=lambda:self.use(master, self.position)).pack()
+		inspectButton = Button(master, text="Inspect", font=("Courier New", 8), command=lambda:self.inspect()).pack()
 
 	def look(self, master):
 		lookWindow = Toplevel()
@@ -92,7 +93,7 @@ class GameWindow:
 
 		v = StringVar(takeWindow)
 		v.set(self.itemKeys[0])
-		m = OptionMenu(takeWindow, v, self.itemKeys)
+		m = OptionMenu(takeWindow, v, *self.itemKeys)
 		m.pack()
 		
 		b = Button(takeWindow, text="Take", command=lambda:self.getStuff(m, v, takeWindow)).pack()
@@ -139,7 +140,7 @@ class GameWindow:
 				self.l2.set("You can't pick that up. It won't budge!")
 		except KeyError:
 			if not(self.itemToGet2 in self.itemKeys):
-				print("That item's not here....")
+				self.l2.set("That item's not here....")
 
 
 	def updateList(self, itemKeys):
@@ -163,7 +164,7 @@ class GameWindow:
 			v = StringVar(useWindow)
 			v.set(self.invKeys[0])
 			l = Label(useWindow, text="Use an item....").pack()
-			m = OptionMenu(useWindow, v, self.invKeys)
+			m = OptionMenu(useWindow, v, *self.invKeys)
 			m.pack()
 
 			b = Button(useWindow, text="Use", command=lambda:self.useStuff(v.get(), useWindow, self.position)).pack()
@@ -208,6 +209,48 @@ class GameWindow:
 		self.l.photo = icon
 		self.l.pack()
 		b = Button(moveWindow, text="-> -> Go -> ->", command=lambda:moveWindow.destroy()).pack()
+
+	def inspect(self):
+		inspectWindow = Toplevel()
+		inspectWindow.title("Inspect")
+
+		self.itemKeys = list(locations[self.position][2].keys())
+		self.itemKeys2 = []
+		for x in self.itemKeys:
+			if locations[self.position][2][x][2][0]:
+				self.itemKeys2.append(x)
+
+		v = StringVar(inspectWindow)
+		if len(self.itemKeys2) > 0:
+			v.set(self.itemKeys2[0])
+		l = Label(inspectWindow, text="Inspect an item....\nIf it's a special item, a new window will appear.").pack()
+		m = OptionMenu(inspectWindow, v, *self.itemKeys2)
+		m.pack()
+
+		b = Button(inspectWindow, text="Submit", command=lambda:self.inspectStuff()).pack()
+
+		# if locations[position][2][user[8:]][2][0]:
+		# 	correct = parseSpecial((locations[position][2][user[8:]][2][1]))
+		# else:
+		# 	l = Label(inspectWindow, text=("	 " + locations[position][2][user[8:]][0])).pack()
+
+	def inspectStuff(self):
+		if details[0] == "NUM":
+		correct = False
+		# Number Puzzle #
+		print("There's a number lock on this.")
+		print("A piece of paper is stuck to the wall beside it.")
+		print("")
+		print("'" + details[1][1] + "'")
+		print("")
+		guess = int(input("Please enter your guess > "))
+
+		if guess == details[1][0]:
+			correct = True
+		else:
+			print("...nothing happens.")
+
+		return correct
 
 
 
