@@ -1,6 +1,10 @@
-locations = [["The Porch", "An old, wooden porch lies before the entrance to the house.", {"key": ["A rusty old key.", False, [False, None]]}],
+locations = [["The Porch", "An old, wooden porch lies before the door to the house.", {"key": ["A rusty old key.", False, [False, None]]}],
 	
-	["Hallway", "The hallway is laden with dust.\nOld paintings hang from the crumbling walls.", {"painting": ["An old painting. '17/11/1873' is written in the lower right corner.", True, [False, None]],
+	["Hallway I", "The hallway is laden with dust.\nOld paintings hang from the crumbling walls.", {"painting": ["An old painting. '17/11/1873' is written in the lower right corner.", True, [False, None]],
+
+		"safe": ["A steel safe. It ain't coming open with brute force.", True, [True, ["NUM", ["1783", "LEFT TO RIGHT | REMOVE REPETITIONS"]]]]}],
+
+	["Hallway II", "Continuing down the hallway, there appears to be a source of light coming from one the rooms further ahead.", {"note": ["A scrap of paper.", True, [False, None]],
 
 		"safe": ["A steel safe. It ain't coming open with brute force.", True, [True, ["NUM", ["1783", "LEFT TO RIGHT | REMOVE REPETITIONS"]]]]}],
 	
@@ -191,17 +195,14 @@ class GameWindow:
 	def checkUse(self, e, itemToUse, position, window):
 		go = parseUse(itemToUse, (locations[self.position][0]), e)
 		if go:
-			self.position += 1
-			self.wellDone()
-			self.locationTitleVar.set(locations[self.position][0])
-			self.locationDescriptionVar.set(locations[self.position][1])
-			window.destroy()
+			self.wellDone(window)
 		else:
 			self.label2.set("Nothing happened.\nAre you sure you're thinking straight?")
 
-	def wellDone(self):
+	def wellDone(self, window):
 		moveWindow = Toplevel()
 		moveWindow.title("Congratulations!")
+		self.position += 1
 		l = Label(moveWindow, text="The pathway to the next room is open.\nWell done!").pack()
 		iconName = ("icons\\one-eyed-small.png")
 		icon = PhotoImage(file=iconName)
@@ -209,6 +210,9 @@ class GameWindow:
 		self.l.photo = icon
 		self.l.pack()
 		b = Button(moveWindow, text="-> -> Go -> ->", command=lambda:moveWindow.destroy()).pack()
+		self.locationTitleVar.set(locations[self.position][0])
+		self.locationDescriptionVar.set(locations[self.position][1])
+		window.destroy()
 
 	def inspect(self):
 		inspectWindow = Toplevel()
@@ -227,30 +231,61 @@ class GameWindow:
 		m = OptionMenu(inspectWindow, v, *self.itemKeys2)
 		m.pack()
 
-		b = Button(inspectWindow, text="Submit", command=lambda:self.inspectStuff()).pack()
+		b = Button(inspectWindow, text="Submit", command=lambda:self.inspectStuff(v.get())).pack()
 
 		# if locations[position][2][user[8:]][2][0]:
 		# 	correct = parseSpecial((locations[position][2][user[8:]][2][1]))
 		# else:
 		# 	l = Label(inspectWindow, text=("	 " + locations[position][2][user[8:]][0])).pack()
 
-	def inspectStuff(self):
+	def inspectStuff(self, item):
+		puzzleWindow = Toplevel()
+		puzzleWindow.title("Inspect")
+
+		details = locations[self.position][2][item][2][1]
+
 		if details[0] == "NUM":
-		correct = False
-		# Number Puzzle #
-		print("There's a number lock on this.")
-		print("A piece of paper is stuck to the wall beside it.")
-		print("")
-		print("'" + details[1][1] + "'")
-		print("")
-		guess = int(input("Please enter your guess > "))
+			correct = False
+			# Number Puzzle #
+			l = Label(puzzleWindow, text="There's a number lock on this.").pack()
+			l = Label(puzzleWindow, text="A piece of paper is stuck to the wall beside it.\n").pack()
+			l = Label(puzzleWindow, text=("'" + details[1][1] + "'\n")).pack()
 
-		if guess == details[1][0]:
-			correct = True
+			numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+
+			var1 = StringVar()
+			var2 = StringVar()
+			var3 = StringVar()
+			var4 = StringVar()
+
+			var1.set(numbers[0])
+			var2.set(numbers[0])
+			var3.set(numbers[0])
+			var4.set(numbers[0])
+
+			comb1 = OptionMenu(puzzleWindow, var1, *numbers)
+			comb1.pack()
+			comb2 = OptionMenu(puzzleWindow, var2, *numbers)
+			comb2.pack()
+			comb3 = OptionMenu(puzzleWindow, var3, *numbers)
+			comb3.pack()
+			comb4 = OptionMenu(puzzleWindow, var4, *numbers)
+			comb4.pack()
+
+			button = Button(puzzleWindow, text="Submit", command=lambda:self.getCombination(var1, var2, var3, var4, details, puzzleWindow)).pack()
+
+	def getCombination(self, var1, var2, var3, var4, details, puzzleWindow):
+		self.guess2 = [var1.get(), var2.get(), var3.get(), var4.get()]
+		self.guess = ""
+		for x in self.guess2:
+			self.guess += str(x)
+
+		print(details[1][0])
+
+		if int(self.guess) == int(details[1][0]):
+			self.wellDone(puzzleWindow)
 		else:
-			print("...nothing happens.")
-
-		return correct
+			l = Label(puzzleWindow, text="...nothing happens.").pack()
 
 
 
