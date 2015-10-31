@@ -4,9 +4,7 @@ locations = [["The Porch", "An old, wooden porch lies before the door to the hou
 
 		"safe": ["A steel safe. It ain't coming open with brute force.", True, [True, ["NUM", ["1783", "LEFT TO RIGHT | REMOVE REPETITIONS"]]]]}],
 
-	["Hallway II", "Continuing down the hallway, there appears to be a source of light coming from one the rooms further ahead.", {"note": ["A scrap of paper.", True, [False, None]],
-
-		"safe": ["A steel safe. It ain't coming open with brute force.", True, [True, ["NUM", ["1783", "LEFT TO RIGHT | REMOVE REPETITIONS"]]]]}],
+	["Hallway II", "Continuing down the hallway, there appears to be a source\n of light coming from one the rooms further ahead.", {"note": ["A scrap of paper.", False, [False, None]]}],
 	
 	] # <- Final List Bracket (Needed)
 
@@ -34,10 +32,10 @@ for infn in glob.glob("icons/*.png"):
 class GameWindow:
 
 	def __init__(self, master):
-		self.position = 0
-		frame = Frame(master)
-		frame.config(width=200, height=80)
-		frame.pack()
+		self.position = 2
+		self.frame = Frame(master)
+		self.frame.config(width=200, height=80)
+		self.frame.pack()
 
 		iconName = ("icons\\brutal-helm-small.png")
 		icon = PhotoImage(file=iconName)
@@ -100,7 +98,7 @@ class GameWindow:
 		m = OptionMenu(takeWindow, v, *self.itemKeys)
 		m.pack()
 		
-		b = Button(takeWindow, text="Take", command=lambda:self.getStuff(m, v, takeWindow)).pack()
+		b = Button(takeWindow, text="Take", command=lambda:self.getStuff(m, v, takeWindow, master)).pack()
 
 		self.l2 = StringVar()
 		l3 = Label(takeWindow, textvariable=self.l2).pack()
@@ -126,7 +124,7 @@ class GameWindow:
 		self.l.pack()
 
 
-	def getStuff(self, m, v, takeWindow):
+	def getStuff(self, m, v, takeWindow, master):
 		self.itemToGet = v.get()
 		self.itemToGet2 = self.itemToGet.replace("[", "").replace("]", "").replace("'", "")
 		print(self.itemToGet2)
@@ -138,6 +136,10 @@ class GameWindow:
 			inventory[self.itemToGet2] = locations[self.position][2][self.itemToGet2]
 			del locations[self.position][2][self.itemToGet2]
 			self.updateImage(self.itemToGet2, takeWindow)
+		
+		if self.itemToGet == "note" and self.position == 2:
+			l = Label(takeWindow, text="You can now READ certain items by selecting\nthe button on the main window!").pack()
+			readButton = Button(master, text="Read", font=("Courier New", 8), command=lambda:self.read()).pack()
 
 		try:
 			if locations[self.position][2][self.itemToGet2][1] and not(locations[self.position][2][self.itemToGet2][2][0]):
@@ -286,6 +288,9 @@ class GameWindow:
 			self.wellDone(puzzleWindow)
 		else:
 			l = Label(puzzleWindow, text="...nothing happens.").pack()
+
+	def read(self, item):
+		pass
 
 
 
