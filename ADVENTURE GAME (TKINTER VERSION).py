@@ -2,7 +2,7 @@ locations = [["The Porch", "An old, wooden porch lies before the door to the hou
 	
 	["Hallway I", "The hallway is laden with dust.\nOld paintings hang from the crumbling walls.", {"painting": ["An old painting. '17/11/1873' is written in the lower right corner.", True, [False, None]],
 
-		"safe": ["A steel safe. It ain't coming open with brute force.", True, [True, ["NUM", ["1783", "LEFT TO RIGHT | REMOVE REPETITIONS"]]]]}],
+		"safe": ["A steel safe. It ain't coming open with brute force.", True, [True, ["NUM", ["1783", "LEFT TO RIGHT | SKIP REPETITIONS"]]]]}],
 
 	["Hallway II", "Continuing down the hallway, there appears to be a source\n of light coming from one the rooms further ahead.", {"note": ["A scrap of paper.", False, [False, None]]}],
 	
@@ -32,7 +32,7 @@ for infn in glob.glob("icons/*.png"):
 class GameWindow:
 
 	def __init__(self, master):
-		self.position = 2
+		self.position = 0
 		self.frame = Frame(master)
 		self.frame.config(width=200, height=80)
 		self.frame.pack()
@@ -44,6 +44,8 @@ class GameWindow:
 		self.l.pack()
 
 		title = Label(master, text="PROJECT-SIXTH", bg="#A0CFE6", font=("Courier New", 31)).pack(expand=1, fill=BOTH)
+
+		helpButton = Button(master, text="Help", font=("Courier New", 13), command=lambda:self.help(master)).pack()
 
 		self.locationTitleVar = StringVar()
 		self.locationTitleVar.set(locations[self.position][0])
@@ -138,6 +140,7 @@ class GameWindow:
 			self.updateImage(self.itemToGet2, takeWindow)
 		
 		if self.itemToGet == "note" and self.position == 2:
+			takeWindow.geometry("300x300")
 			l = Label(takeWindow, text="You can now READ certain items by selecting\nthe button on the main window!").pack()
 			readButton = Button(master, text="Read", font=("Courier New", 8), command=lambda:self.read()).pack()
 
@@ -292,7 +295,23 @@ class GameWindow:
 	def read(self, item):
 		pass
 
+	def help(self, master):
+		helpWindow = Toplevel(master)
+		helpWindow.title("Help")
+		helpWindow.config(bg="#00A5DD")
 
+		l = Label(helpWindow, text="PROJECT-SIXTH\n", bg="#00A5DD", fg="#8D0013", font=("Courier New", 44)).pack()
+		l = Label(helpWindow, text="The aim of PROJECT-SIXTH is to advance from one room to the next.\nIt might be as simple as walking through the door,\nothers could require the finding of a small object\n\n", bg="#22A5DD", font=("Courier New", 11)).pack()
+		l = Label(helpWindow, text="Use the buttons on the main window (with the helmet and the words 'PROJECT-SIXTH')\nto utilise various functions within the game.\n", bg="#22A5DD", font=("Courier New", 11)).pack()
+
+		l = Label(helpWindow, text="Commands available in LEVEL 1", font=("Courier New", 17), bg="#7A33DD").pack()
+		l = Label(helpWindow, text="look - look around for items\n", font=("Courier New", 15), bg="#BC99DD").pack()
+		l = Label(helpWindow, text="take (take x) - take an item\n", font=("Courier New", 15), bg="#BC99DD").pack()
+		l = Label(helpWindow, text="use (take x) - use an item\n", font=("Courier New", 15), bg="#BC99DD").pack()
+		l = Label(helpWindow, text="inspect (inspect x) - inspect an item in greater detail.\nIf the item is 'special' (i.e. something can be done with it, like enter a password)\nthen it can be accessed through this command.", font=("Courier New", 15), bg="#BC99DD").pack()
+		if self.position >= 2:
+			l = Label(helpWindow, text="Commands available in LEVEL 2", font=("Courier New", 17), bg="#7A33DD").pack()
+			l = Label(helpWindow, text="read (read x) - Read an item that has text on it,\nfor example a book or note.", font=("Courier New", 15), bg="#7A99DD").pack()
 
 
 
