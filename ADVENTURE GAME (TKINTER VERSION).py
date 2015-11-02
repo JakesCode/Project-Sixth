@@ -32,7 +32,7 @@ for infn in glob.glob("icons/*.png"):
 class GameWindow:
 
 	def __init__(self, master):
-		self.position = 0
+		self.position = 2
 		self.frame = Frame(master)
 		self.frame.config(width=200, height=80)
 		self.frame.pack()
@@ -60,7 +60,7 @@ class GameWindow:
 	def mainWindow(self, master):
 		l = Label(master, text="Choose an option....", font=("Courier New", 20)).pack()
 		lookButton = Button(master, text="Look", font=("Courier New", 8), command=lambda:self.look(master)).pack()
-		takeButton = Button(master, text="Take", font=("Courier New", 8), command=lambda:self.take(master)).pack()
+		takeButton = Button(master, text="Take", font=("Courier New", 8), command=lambda:self.takeVersion2(master)).pack()
 		useButton = Button(master, text="Use", font=("Courier New", 8), command=lambda:self.use(master, self.position)).pack()
 		inspectButton = Button(master, text="Inspect", font=("Courier New", 8), command=lambda:self.inspect()).pack()
 
@@ -115,6 +115,21 @@ class GameWindow:
 		self.l.pack()
 
 		blankLabel = Label(takeWindow, text="\n").pack()
+
+	def takeVersion2(self, master):
+		takeWindow = Toplevel(master)
+		takeWindow.title("Take")
+
+		self.leftIcon = PhotoImage(file="icons\\left-small.png")
+		self.l = Button(takeWindow)
+		self.l.config(image=self.leftIcon)
+		self.l.grid(row=4, column=0)
+
+		self.rightIcon = PhotoImage(file="icons\\right-small.png")
+		self.l2 = Button(takeWindow)
+		self.l2.config(image=self.rightIcon)
+		self.l2.grid(row=4, column=2)
+
 
 
 	def updateImage(self, toChangeTo, window):
