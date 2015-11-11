@@ -60,7 +60,7 @@ class GameWindow:
 	def mainWindow(self, master):
 		l = Label(master, text="Choose an option....", font=("Courier New", 20)).pack()
 		lookButton = Button(master, text="Look", font=("Courier New", 8), command=lambda:self.look(master)).pack()
-		takeButton = Button(master, text="Take", font=("Courier New", 8), command=lambda:self.takeVersion2(master)).pack()
+		takeButton = Button(master, text="Take", font=("Courier New", 8), command=lambda:self.take(master)).pack()
 		useButton = Button(master, text="Use", font=("Courier New", 8), command=lambda:self.use(master, self.position)).pack()
 		inspectButton = Button(master, text="Inspect", font=("Courier New", 8), command=lambda:self.inspect()).pack()
 
