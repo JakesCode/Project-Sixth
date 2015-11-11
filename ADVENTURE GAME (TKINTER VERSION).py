@@ -32,7 +32,7 @@ for infn in glob.glob("icons/*.png"):
 class GameWindow:
 
 	def __init__(self, master):
-		self.position = 2
+		self.position = 0
 		self.frame = Frame(master)
 		self.frame.config(width=200, height=80)
 		self.frame.pack()
